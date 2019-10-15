@@ -10,6 +10,7 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -33,7 +34,7 @@ public class SimpleDoubleRoundButton extends View {
     private int leftTouchRectColor = Color.DKGRAY;
     //右半部分背景颜色
     private int rightRectColor = Color.RED;
-    //左半部分触摸背景颜色
+    //右半部分触摸背景颜色
     private int rightTouchRectColor = Color.GRAY;
     //边框宽度
     private int strokeWidth = dp2px(0);
@@ -80,6 +81,10 @@ public class SimpleDoubleRoundButton extends View {
     private Paint leftTextPaint = new Paint();
     //右边按钮画笔
     private Paint rightTextPaint = new Paint();
+    //边框启用
+    private StrokeEnalbe strokeEnalbe = StrokeEnalbe.all;
+
+    private int leftOrRightClick;
 
     private OnSimpleDoubleRoundButtonCallBack onSimpleDoubleRoundButtonCallBack;
 
@@ -133,6 +138,7 @@ public class SimpleDoubleRoundButton extends View {
      * 初始化各种画笔
      */
     private void init() {
+
         leftPaint.setAntiAlias(true);
         leftPaint.setStyle(Paint.Style.FILL);
         leftPaint.setColor(leftRectColor);
@@ -216,12 +222,14 @@ public class SimpleDoubleRoundButton extends View {
             case MotionEvent.ACTION_UP:
                 if (event.getX() > leftRect.left && event.getX() < leftRect.right) {
                     leftPaint.setColor(leftRectColor);
+                    leftOrRightClick = Gravity.LEFT;
                     if (onSimpleDoubleRoundButtonCallBack != null) {
                         onSimpleDoubleRoundButtonCallBack.onLeftButtonClick(SimpleDoubleRoundButton.this);
                     }
                 }
                 if (event.getX() > rightRect.left && event.getX() < rightRect.right) {
                     rightPaint.setColor(rightRectColor);
+                    leftOrRightClick = Gravity.RIGHT;
                     if (onSimpleDoubleRoundButtonCallBack != null) {
                         onSimpleDoubleRoundButtonCallBack.onRightButtonClick(SimpleDoubleRoundButton.this);
                     }
@@ -239,11 +247,22 @@ public class SimpleDoubleRoundButton extends View {
         canvas.drawPath(leftPath, leftPaint);
         canvas.drawPath(rightPath, rightPaint);
         if (leftRect.width() > 0) {
-            canvas.drawText(leftText, leftRect.left + leftRect.width() / 2 - getTextSize(true, leftText, leftTextPaint) / 2 - strokeWidth / 2, leftRect.bottom / 2 + getTextSize(false, leftText, leftTextPaint) / 2 + strokeWidth / 2, leftTextPaint);
+            canvas.drawText(leftText, leftRect.left + leftRect.width() / 2 - getTextSize(true, leftText, leftTextPaint) / 2 - getStroke(leftOrRightClick) / 2, leftRect.bottom / 2 + getTextSize(false, leftText, leftTextPaint) / 2 + getStroke(leftOrRightClick) / 2, leftTextPaint);
         }
         if (rightRect.width() > 0) {
-            canvas.drawText(rightText, rightRect.left + rightRect.width() / 2 - getTextSize(true, rightText, rightTextPaint) / 2 + strokeWidth / 2, rightRect.bottom / 2 + getTextSize(false, rightText, rightTextPaint) / 2 + strokeWidth / 2, rightTextPaint);
+            canvas.drawText(rightText, rightRect.left + rightRect.width() / 2 - getTextSize(true, rightText, rightTextPaint) / 2 + getStroke(leftOrRightClick) / 2, rightRect.bottom / 2 + getTextSize(false, rightText, rightTextPaint) / 2 + getStroke(leftOrRightClick) / 2, rightTextPaint);
         }
+    }
+
+    private int getStroke(int direction) {
+
+        if (direction == Gravity.LEFT && (strokeEnalbe == StrokeEnalbe.left || strokeEnalbe == StrokeEnalbe.all)) {
+            return strokeWidth;
+        }
+        if (direction == Gravity.RIGHT && (strokeEnalbe == StrokeEnalbe.right || strokeEnalbe == StrokeEnalbe.all)) {
+            return strokeWidth;
+        }
+        return 0;
     }
 
     /**
@@ -251,15 +270,15 @@ public class SimpleDoubleRoundButton extends View {
      */
     private void computeSize() {
         //左半部分按钮绘制区域
-        leftRect.left = 0 + strokeWidth;
-        leftRect.top = 0 + strokeWidth;
+        leftRect.left = 0 + getStroke(Gravity.LEFT);
+        leftRect.top = 0 + getStroke(Gravity.LEFT);
         leftRect.right = (int) (getWidth() * buttonRectPercent);
-        leftRect.bottom = getHeight() - strokeWidth;
+        leftRect.bottom = getHeight() - getStroke(Gravity.LEFT);
         //右半部分按钮绘制区域
         rightRect.left = leftRect.right;
-        rightRect.top = 0 + strokeWidth;
-        rightRect.right = getWidth() - strokeWidth;
-        rightRect.bottom = getHeight() - strokeWidth;
+        rightRect.top = 0 + getStroke(Gravity.RIGHT);
+        rightRect.right = getWidth() - getStroke(Gravity.RIGHT);
+        rightRect.bottom = getHeight() - getStroke(Gravity.RIGHT);
         //边框绘制区域
         strokeRect.left = 0;
         strokeRect.top = 0;
@@ -297,6 +316,12 @@ public class SimpleDoubleRoundButton extends View {
         strokePath.lineTo(strokeRect.left, strokeRect.left + leftTopCornersRadius);
         strokePath.cubicTo(strokeRect.left, strokeRect.left + leftTopCornersRadius, strokeRect.left, strokeRect.top, strokeRect.left + leftTopCornersRadius, strokeRect.top);
         strokePath.close();
+    }
+
+    public void setStrokeEnalbe(StrokeEnalbe strokeEnalbe) {
+        this.strokeEnalbe = strokeEnalbe;
+        computeSize();
+        invalidate();
     }
 
     /**
@@ -496,6 +521,10 @@ public class SimpleDoubleRoundButton extends View {
             return 0;
         }
         return isWidth ? (int) p.measureText(str) : (int) (p.getFontMetrics().descent - p.getFontMetrics().ascent) / 2;
+    }
+
+    public enum StrokeEnalbe {
+        left, right, all, none
     }
 
 }
