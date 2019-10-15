@@ -30,11 +30,13 @@ No picture u say a j8!
             @Override
             public void onLeftButtonClick(SimpleDoubleRoundButton view) {
                //左侧按钮回调事件
+               //view.setStrokeEnalbe(SimpleDoubleRoundButton.StrokeEnalbe.right);//如果你希望点击后启用右侧按钮的边框可以加上这行
             }
 
             @Override
             public void onRightButtonClick(SimpleDoubleRoundButton view) {
                //右侧按钮回调事件
+               //view.setStrokeEnalbe(SimpleDoubleRoundButton.StrokeEnalbe.left);//如果你希望点击后启用左侧按钮的边框可以加上这行
             }
         });
 
