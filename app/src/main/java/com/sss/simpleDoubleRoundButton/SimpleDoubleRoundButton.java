@@ -142,10 +142,12 @@ public class SimpleDoubleRoundButton extends View {
         leftPaint.setAntiAlias(true);
         leftPaint.setStyle(Paint.Style.FILL);
         leftPaint.setColor(leftRectColor);
+        leftPaint.setTextAlign(Paint.Align.CENTER);
 
         rightPaint.setAntiAlias(true);
         rightPaint.setStyle(Paint.Style.FILL);
         rightPaint.setColor(rightRectColor);
+        rightPaint.setTextAlign(Paint.Align.CENTER);
 
         strokePaint.setAntiAlias(true);
         strokePaint.setStyle(Paint.Style.FILL);
@@ -252,6 +254,7 @@ public class SimpleDoubleRoundButton extends View {
         if (rightRect.width() > 0) {
             canvas.drawText(rightText, rightRect.left + rightRect.width() / 2 - getTextSize(true, rightText, rightTextPaint) / 2 + getStroke(leftOrRightClick) / 2, rightRect.bottom / 2 + getTextSize(false, rightText, rightTextPaint) / 2 + getStroke(leftOrRightClick) / 2, rightTextPaint);
         }
+
     }
 
     private int getStroke(int direction) {
